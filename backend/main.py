@@ -17,7 +17,16 @@ app = FastAPI(lifespan=lifespan)
 origins = [
     "http://localhost:5173",
     "http://127.0.0.1:5173",
+    # Add your production frontend URL here when you have it, e.g.:
+    # "https://your-pickle-app.netlify.app",
+    # Or allow all for development/testing (be careful in production):
+    # "*",
 ]
+
+# You can also use an environment variable for flexible configuration
+import os
+if os.getenv("FRONTEND_URL"):
+    origins.append(os.getenv("FRONTEND_URL"))
 
 app.add_middleware(
     CORSMiddleware,
