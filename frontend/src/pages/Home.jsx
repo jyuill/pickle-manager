@@ -21,7 +21,12 @@ const Home = () => {
         const fetchRecipes = async () => {
             try {
                 const res = await api.get('/recipes/');
-                setRecipes(res.data);
+                if (Array.isArray(res.data)) {
+                    setRecipes(res.data);
+                } else {
+                    console.error("Unexpected response format for recipes:", res.data);
+                    setRecipes([]);
+                }
             } catch (error) {
                 console.error("Failed to fetch recipes", error);
             }
@@ -40,7 +45,12 @@ const Home = () => {
                 if (maxRating > 0) params.max_rating = maxRating;
 
                 const res = await api.get('/batches/', { params });
-                setFilteredBatches(res.data);
+                if (Array.isArray(res.data)) {
+                    setFilteredBatches(res.data);
+                } else {
+                    console.error("Unexpected response format for batches:", res.data);
+                    setFilteredBatches([]);
+                }
             } catch (error) {
                 console.error("Failed to search batches", error);
             } finally {
