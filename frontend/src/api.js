@@ -1,6 +1,12 @@
 import axios from 'axios';
 
-const baseURL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+let baseURL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+
+// Ensure protocol is present to avoid relative path issues
+if (!baseURL.startsWith('http')) {
+    baseURL = `https://${baseURL}`;
+}
+
 console.log('API Base URL:', baseURL);
 
 const api = axios.create({
