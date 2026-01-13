@@ -2,7 +2,7 @@ from fastapi import FastAPI, Depends, HTTPException, status
 from sqlmodel import Session, select
 from typing import List, Optional
 from database import init_db, get_session
-from models import Recipe, RecipeCreate, RecipeRead, RecipeUpdate, Batch, BatchCreate, BatchRead, BatchUpdate, TastingNote, TastingNoteCreate, TastingNoteRead
+from models import Recipe, RecipeCreate, RecipeRead, RecipeUpdate, Batch, BatchCreate, BatchRead, BatchUpdate, TastingNote, TastingNoteCreate, TastingNoteRead, TastingNoteUpdate, BatchImage, BatchImageBase
 from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
 from datetime import datetime
@@ -150,12 +150,59 @@ def create_tasting_note(batch_id: str, note: TastingNoteCreate, session: Session
     session.refresh(db_note)
     return db_note
 
+@app.post("/batches/{batch_id}/images/", response_model=BatchImageBase)
+def create_batch_image(batch_id: str, image: BatchImageBase, session: Session = Depends(get_session)):
+    batch = session.get(Batch, batch_id)
+    if not batch:
+        raise HTTPException(status_code=404, detail="Batch not found")
+        
+    db_image = BatchImage(batch_id=batch_id, image_url=image.image_url)
+    session.add(db_image)
+    session.commit()
+    session.refresh(db_image)
+    return db_image
+
+@app.patch("/tasting-notes/{note_id}", response_model=TastingNoteRead)
+def update_tasting_note(note_id: int, note_update: TastingNoteUpdate, session: Session = Depends(get_session)):
+    db_note = session.get(TastingNote, note_id)
+    if not db_note:
+        raise HTTPException(status_code=404, detail="Note not found")
+    
+    note_data = note_update.model_dump(exclude_unset=True)
+    for key, value in note_data.items():
+        setattr(db_note, key, value)
+    
+    session.add(db_note)
+    session.commit()
+    session.refresh(db_note)
+    return db_note
+
 @app.delete("/tasting-notes/{note_id}")
 def delete_tasting_note(note_id: int, session: Session = Depends(get_session)):
     note = session.get(TastingNote, note_id)
     if not note:
         raise HTTPException(status_code=404, detail="Note not found")
     session.delete(note)
+    session.commit()
+    return {"ok": True}
+
+@app.delete("/tasting-notes/{note_id}/image")
+def delete_tasting_note_image(note_id: int, session: Session = Depends(get_session)):
+    note = session.get(TastingNote, note_id)
+    if not note:
+        raise HTTPException(status_code=404, detail="Note not found")
+    note.image_url = None
+    session.add(note)
+    session.commit()
+    session.refresh(note)
+    return note
+
+@app.delete("/batch-images/{image_id}")
+def delete_batch_image(image_id: int, session: Session = Depends(get_session)):
+    image = session.get(BatchImage, image_id)
+    if not image:
+        raise HTTPException(status_code=404, detail="Image not found")
+    session.delete(image)
     session.commit()
     return {"ok": True}
 
@@ -221,6 +268,17 @@ def read_batch(batch_id: str, session: Session = Depends(get_session)):
     if not batch:
         raise HTTPException(status_code=404, detail="Batch not found")
     return batch
+
+    return batch
+
+@app.delete("/batches/{batch_id}")
+def delete_batch(batch_id: str, session: Session = Depends(get_session)):
+    batch = session.get(Batch, batch_id)
+    if not batch:
+        raise HTTPException(status_code=404, detail="Batch not found")
+    session.delete(batch)
+    session.commit()
+    return {"ok": True}
 
 @app.get("/recipes/{recipe_id}/batches", response_model=List[BatchRead])
 def read_batches_for_recipe(recipe_id: int, session: Session = Depends(get_session)):

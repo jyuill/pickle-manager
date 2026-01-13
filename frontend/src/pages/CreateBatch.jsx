@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import api from '../api';
-import { ArrowLeft, CheckCircle } from 'lucide-react';
+import { ArrowLeft, CheckCircle, Trash } from 'lucide-react';
+import ImageUpload from '../components/ImageUpload';
 
 const CreateBatch = () => {
     const { recipeId, batchId } = useParams();
@@ -15,6 +16,8 @@ const CreateBatch = () => {
         notes: '',
     });
     const [loading, setLoading] = useState(false);
+    const [initialImage, setInitialImage] = useState(null);
+    const [existingImages, setExistingImages] = useState([]);
 
     const [recipeName, setRecipeName] = useState('');
 
@@ -39,6 +42,7 @@ const CreateBatch = () => {
                         fridge_date: response.data.fridge_date,
                         notes: response.data.notes,
                     });
+                    setExistingImages(response.data.images || []);
                     fetchRecipeName(response.data.recipe_id);
                 } catch (error) {
                     console.error("Failed to fetch batch", error);
@@ -62,9 +66,18 @@ const CreateBatch = () => {
 
             if (isEditMode) {
                 await api.patch(`/batches/${batchId}`, payload);
+                // If adding image in edit mode, logic might be different or usually just use Detail view.
+                // But if they uploaded one here:
+                if (initialImage) {
+                    await api.post(`/batches/${batchId}/images/`, { image_url: initialImage });
+                }
                 navigate(`/batches/${batchId}`);
             } else {
-                await api.post('/batches/', payload);
+                const res = await api.post('/batches/', payload);
+                const newBatchId = res.data.id;
+                if (initialImage) {
+                    await api.post(`/batches/${newBatchId}/images/`, { image_url: initialImage });
+                }
                 navigate(`/recipes/${recipeId}`);
             }
         } catch (error) {
@@ -119,6 +132,54 @@ const CreateBatch = () => {
                         value={formData.notes || ''}
                         onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
                     />
+                </div>
+
+                <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Batch Photos</label>
+
+                    {/* Existing Images Grid */}
+                    {existingImages.length > 0 && (
+                        <div className="grid grid-cols-3 sm:grid-cols-4 gap-2 mb-3">
+                            {existingImages.map((img) => (
+                                <div key={img.id} className="relative aspect-square rounded-lg overflow-hidden border border-gray-200 group">
+                                    <img src={img.image_url} alt="Batch" className="w-full h-full object-cover" />
+                                    <button
+                                        type="button"
+                                        onClick={async () => {
+                                            if (!window.confirm("Delete this image?")) return;
+                                            try {
+                                                await api.delete(`/batch-images/${img.id}`);
+                                                setExistingImages(prev => prev.filter(i => i.id !== img.id));
+                                            } catch (err) { console.error("Failed to delete image", err); }
+                                        }}
+                                        className="absolute top-1 right-1 bg-red-500 text-white p-1 rounded-full opacity-0 group-hover:opacity-100 transition shadow"
+                                    >
+                                        <Trash size={14} />
+                                    </button>
+                                </div>
+                            ))}
+                        </div>
+                    )}
+
+                    <div className="bg-gray-50 p-4 rounded-lg border border-dashed border-gray-200">
+                        <ImageUpload
+                            label={existingImages.length > 0 ? "Add Another Photo" : "Add Batch Photo (Optional)"}
+                            onUploadSuccess={isEditMode ? async (url) => {
+                                // If in edit mode, upload immediately triggers a save/link
+                                try {
+                                    const res = await api.post(`/batches/${batchId}/images/`, { image_url: url });
+                                    setExistingImages(prev => [...prev, res.data]);
+                                    // We don't need 'initialImage' state in edit mode if we auto-save
+                                } catch (e) { console.error("Failed to link image", e); }
+                            } : setInitialImage}
+                            autoClear={isEditMode}
+                        />
+                        {/* Show preview for initialImage in create mode only if ImageUpload doesn't handle preview persistence (it handles its own preview, but we might want to show it here if we wanted to be fancy. For now, ImageUpload's internal preview is fine for the 'pending' upload). 
+                             Actually, ImageUpload clears itself on success if autoClear is true. 
+                             In Create Mode, autoClear is false (default), so ImageUpload shows the preview.
+                             In Edit Mode, autoClear is true, so we clear it and show it in the grid.
+                         */}
+                    </div>
                 </div>
 
                 <button
