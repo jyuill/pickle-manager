@@ -17,10 +17,9 @@ app = FastAPI(lifespan=lifespan)
 origins = [
     "http://localhost:5173",
     "http://127.0.0.1:5173",
-    # Add your production frontend URL here when you have it, e.g.:
-    # "https://your-pickle-app.netlify.app",
-    # Or allow all for development/testing (be careful in production):
-    # "*",
+    "https://picklemanager.netlify.app",
+    "https://www.picklejohnny.com",
+    "https://picklejohnny.com",
 ]
 
 # You can also use an environment variable for flexible configuration
