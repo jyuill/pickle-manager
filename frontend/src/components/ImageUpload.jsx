@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Image as ImageIcon, Loader2, X } from 'lucide-react';
 import axios from 'axios';
+import api from '../api';
 
 const ImageUpload = ({ onUploadSuccess, label = "Add Photo", autoClear = false }) => {
     const [uploading, setUploading] = useState(false);
@@ -15,12 +16,25 @@ const ImageUpload = ({ onUploadSuccess, label = "Add Photo", autoClear = false }
         setPreview(objectUrl);
         setUploading(true);
 
-        const formData = new FormData();
-        formData.append('file', file);
-        formData.append('upload_preset', import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET);
-
         try {
+            const preset = import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET;
             const cloudName = import.meta.env.VITE_CLOUDINARY_CLOUD_NAME;
+            const apiKey = import.meta.env.VITE_CLOUDINARY_API_KEY;
+
+            // 1. Get Signature from Backend
+            const sigRes = await api.get('/signature', {
+                params: { upload_preset: preset }
+            });
+            const { signature, timestamp } = sigRes.data;
+
+            // 2. Upload to Cloudinary with Signature
+            const formData = new FormData();
+            formData.append('file', file);
+            formData.append('upload_preset', preset);
+            formData.append('timestamp', timestamp);
+            formData.append('signature', signature);
+            formData.append('api_key', apiKey);
+
             const res = await axios.post(
                 `https://api.cloudinary.com/v1_1/${cloudName}/image/upload`,
                 formData
@@ -36,8 +50,18 @@ const ImageUpload = ({ onUploadSuccess, label = "Add Photo", autoClear = false }
         } catch (error) {
             console.error("Upload failed", error);
             setUploading(false);
-            alert("Failed to upload image. Check console.");
-            setPreview(null);
+            if (error.response?.status === 401) {
+                // Auth error handled by interceptor, but we still need to stop loading
+                // User will see login modal
+            } else {
+                alert("Failed to upload image. ensure you are logged in and have API Key configured.");
+            }
+            // Keep preview if it was just an auth error so they can see what they tried to upload?
+            // Actually better to reset or they might think it worked. 
+            // But if they login, they might want to retry.
+            // Let's keep preview but maybe show error state? Simpler to just reset for now or keep it.
+            // I'll leave the preview there so they know "oh I was trying to upload this". 
+            // But 'uploading' is false.
         }
     };
 

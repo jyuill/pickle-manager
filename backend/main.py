@@ -35,7 +35,40 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-@app.post("/recipes/", response_model=RecipeRead)
+# --- Security & Cloudinary ---
+from fastapi import Header, Query
+import hashlib
+import time
+
+ADMIN_PASSWORD = os.getenv("ADMIN_PASSWORD", "pickle_secret")
+CLOUDINARY_API_SECRET = os.getenv("CLOUDINARY_API_SECRET", "")
+
+def verify_admin(x_admin_password: str = Header(None)):
+    if x_admin_password != ADMIN_PASSWORD:
+        raise HTTPException(status_code=401, detail="Invalid Admin Password")
+    return True
+
+@app.get("/signature", dependencies=[Depends(verify_admin)])
+def get_signature(upload_preset: Optional[str] = None):
+    if not CLOUDINARY_API_SECRET:
+        raise HTTPException(status_code=500, detail="Cloudinary Secret not configured")
+    
+    timestamp = int(time.time())
+    params = {"timestamp": timestamp}
+    if upload_preset:
+        params["upload_preset"] = upload_preset
+    
+    # Sort and concatenate
+    sorted_params = sorted(params.items())
+    string_to_sign = "&".join([f"{k}={v}" for k, v in sorted_params])
+    string_to_sign += CLOUDINARY_API_SECRET
+    
+    signature = hashlib.sha1(string_to_sign.encode('utf-8')).hexdigest()
+    return {"signature": signature, "timestamp": timestamp}
+
+# --- Endpoints ---
+
+@app.post("/recipes/", response_model=RecipeRead, dependencies=[Depends(verify_admin)])
 def create_recipe(recipe: RecipeCreate, session: Session = Depends(get_session)):
     db_recipe = Recipe.from_orm(recipe)
     session.add(db_recipe)
@@ -55,7 +88,7 @@ def read_recipe(recipe_id: int, session: Session = Depends(get_session)):
         raise HTTPException(status_code=404, detail="Recipe not found")
     return recipe
 
-@app.patch("/recipes/{recipe_id}", response_model=RecipeRead)
+@app.patch("/recipes/{recipe_id}", response_model=RecipeRead, dependencies=[Depends(verify_admin)])
 def update_recipe(recipe_id: int, recipe_update: RecipeUpdate, session: Session = Depends(get_session)):
     db_recipe = session.get(Recipe, recipe_id)
     if not db_recipe:
@@ -137,7 +170,7 @@ def read_all_batches(
         
     return filtered_batches
 
-@app.post("/batches/{batch_id}/tasting-notes/", response_model=TastingNoteRead)
+@app.post("/batches/{batch_id}/tasting-notes/", response_model=TastingNoteRead, dependencies=[Depends(verify_admin)])
 def create_tasting_note(batch_id: str, note: TastingNoteCreate, session: Session = Depends(get_session)):
     batch = session.get(Batch, batch_id)
     if not batch:
@@ -149,7 +182,7 @@ def create_tasting_note(batch_id: str, note: TastingNoteCreate, session: Session
     session.refresh(db_note)
     return db_note
 
-@app.post("/batches/{batch_id}/images/", response_model=BatchImageBase)
+@app.post("/batches/{batch_id}/images/", response_model=BatchImageBase, dependencies=[Depends(verify_admin)])
 def create_batch_image(batch_id: str, image: BatchImageBase, session: Session = Depends(get_session)):
     batch = session.get(Batch, batch_id)
     if not batch:
@@ -161,7 +194,7 @@ def create_batch_image(batch_id: str, image: BatchImageBase, session: Session = 
     session.refresh(db_image)
     return db_image
 
-@app.patch("/tasting-notes/{note_id}", response_model=TastingNoteRead)
+@app.patch("/tasting-notes/{note_id}", response_model=TastingNoteRead, dependencies=[Depends(verify_admin)])
 def update_tasting_note(note_id: int, note_update: TastingNoteUpdate, session: Session = Depends(get_session)):
     db_note = session.get(TastingNote, note_id)
     if not db_note:
@@ -176,7 +209,7 @@ def update_tasting_note(note_id: int, note_update: TastingNoteUpdate, session: S
     session.refresh(db_note)
     return db_note
 
-@app.delete("/tasting-notes/{note_id}")
+@app.delete("/tasting-notes/{note_id}", dependencies=[Depends(verify_admin)])
 def delete_tasting_note(note_id: int, session: Session = Depends(get_session)):
     note = session.get(TastingNote, note_id)
     if not note:
@@ -185,7 +218,7 @@ def delete_tasting_note(note_id: int, session: Session = Depends(get_session)):
     session.commit()
     return {"ok": True}
 
-@app.delete("/tasting-notes/{note_id}/image")
+@app.delete("/tasting-notes/{note_id}/image", dependencies=[Depends(verify_admin)])
 def delete_tasting_note_image(note_id: int, session: Session = Depends(get_session)):
     note = session.get(TastingNote, note_id)
     if not note:
@@ -196,7 +229,7 @@ def delete_tasting_note_image(note_id: int, session: Session = Depends(get_sessi
     session.refresh(note)
     return note
 
-@app.delete("/batch-images/{image_id}")
+@app.delete("/batch-images/{image_id}", dependencies=[Depends(verify_admin)])
 def delete_batch_image(image_id: int, session: Session = Depends(get_session)):
     image = session.get(BatchImage, image_id)
     if not image:
@@ -205,7 +238,7 @@ def delete_batch_image(image_id: int, session: Session = Depends(get_session)):
     session.commit()
     return {"ok": True}
 
-@app.post("/batches/", response_model=BatchRead)
+@app.post("/batches/", response_model=BatchRead, dependencies=[Depends(verify_admin)])
 def create_batch(batch: BatchCreate, session: Session = Depends(get_session)):
     # ID Generation Logic
     # date_made is expected to be YYYY-MM-DD
@@ -246,7 +279,7 @@ def create_batch(batch: BatchCreate, session: Session = Depends(get_session)):
     session.refresh(db_batch)
     return db_batch
 
-@app.patch("/batches/{batch_id}", response_model=BatchRead)
+@app.patch("/batches/{batch_id}", response_model=BatchRead, dependencies=[Depends(verify_admin)])
 def update_batch(batch_id: str, batch_update: BatchUpdate, session: Session = Depends(get_session)):
     db_batch = session.get(Batch, batch_id)
     if not db_batch:
@@ -270,7 +303,7 @@ def read_batch(batch_id: str, session: Session = Depends(get_session)):
 
     return batch
 
-@app.delete("/batches/{batch_id}")
+@app.delete("/batches/{batch_id}", dependencies=[Depends(verify_admin)])
 def delete_batch(batch_id: str, session: Session = Depends(get_session)):
     batch = session.get(Batch, batch_id)
     if not batch:
