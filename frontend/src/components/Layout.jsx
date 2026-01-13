@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { ChefHat, PlusCircle, Home } from 'lucide-react';
+import { PlusCircle, Home } from 'lucide-react';
 
 const Layout = ({ children }) => {
     const location = useLocation();
@@ -10,8 +10,8 @@ const Layout = ({ children }) => {
             <header className="bg-pickle-green-600 text-white shadow-md">
                 <div className="max-w-4xl mx-auto px-4 py-4 flex items-center justify-between">
                     <Link to="/" className="flex items-center space-x-2 text-xl font-bold hover:text-pickle-green-100 transition">
-                        <ChefHat size={28} />
-                        <span>Pickle Tracker</span>
+                        <img src="/pickle-j-right-circle-gemini.png" alt="Pickle Manager" className="w-8 h-8 rounded-full" />
+                        <span>Pickle Manager</span>
                     </Link>
                     <nav className="flex space-x-4">
                         <Link
