@@ -1,5 +1,6 @@
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
+import ReactGA from "react-ga4";
 import Layout from './components/Layout';
 import Home from './pages/Home';
 import RecipeDetail from './pages/RecipeDetail';
@@ -8,6 +9,21 @@ import CreateBatch from './pages/CreateBatch';
 import BatchDetail from './pages/BatchDetail';
 import LoginModal from './components/LoginModal';
 import { useState, useEffect } from 'react';
+
+const GA_MEASUREMENT_ID = import.meta.env.VITE_GOOGLE_ANALYTICS_ID;
+if (GA_MEASUREMENT_ID) {
+  ReactGA.initialize(GA_MEASUREMENT_ID);
+}
+
+const AnalyticsTracker = () => {
+  const location = useLocation();
+  useEffect(() => {
+    if (GA_MEASUREMENT_ID) {
+      ReactGA.send({ hitType: "pageview", page: location.pathname + location.search });
+    }
+  }, [location]);
+  return null;
+};
 
 function App() {
   const [showLogin, setShowLogin] = useState(false);
@@ -20,6 +36,7 @@ function App() {
 
   return (
     <Router>
+      <AnalyticsTracker />
       <Layout>
         <Routes>
           <Route path="/" element={<Home />} />

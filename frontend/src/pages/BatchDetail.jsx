@@ -297,7 +297,7 @@ const BatchDetail = () => {
 };
 
 const TastingNoteForm = ({ initialData = {}, onSubmit, onCancel, submitLabel = "Submit" }) => {
-    const [name, setName] = useState(initialData.reviewer_name || "Maker");
+    const [name, setName] = useState(initialData.reviewer_name || "PJ");
     const [rating, setRating] = useState(initialData.rating || 0);
     const [note, setNote] = useState(initialData.note || "");
     const [imageUrl, setImageUrl] = useState(initialData.image_url || null);
