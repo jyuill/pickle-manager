@@ -26,7 +26,7 @@ const LandingPage = () => {
                     to="/manager"
                     className="flex items-center justify-center space-x-2 bg-pickle-green-600 text-white px-8 py-4 rounded-xl font-bold text-lg hover:bg-pickle-green-700 transition shadow-lg hover:shadow-xl transform hover:-translate-y-1 w-full sm:w-auto"
                 >
-                    <span>Launch App</span>
+                    <span>Pickle Manager</span>
                     <ArrowRight size={20} />
                 </Link>
 
