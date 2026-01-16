@@ -148,7 +148,7 @@ const Home = () => {
                             {filteredBatches.map((batch) => (
                                 <Link
                                     key={batch.id}
-                                    to={`/batches/${batch.id}`}
+                                    to={`/manager/batches/${batch.id}`}
                                     className="flex items-center justify-between p-3 bg-gray-50 rounded-lg hover:bg-pickle-green-50 hover:text-pickle-green-800 transition group"
                                 >
                                     <div>
@@ -180,7 +180,7 @@ const Home = () => {
                 <div className="flex items-center justify-between mb-6">
                     <h1 className="text-2xl font-bold text-gray-800">My Recipes</h1>
                     <Link
-                        to="/new-recipe"
+                        to="/manager/new-recipe"
                         className="md:flex hidden items-center space-x-2 bg-pickle-green-600 text-white px-4 py-2 rounded-lg hover:bg-pickle-green-700 transition shadow-sm"
                     >
                         <Plus size={20} />
@@ -191,8 +191,9 @@ const Home = () => {
                 {recipes.length === 0 ? (
                     <div className="text-center py-12 bg-white rounded-xl shadow-sm border border-gray-100">
                         <p className="text-gray-500 mb-4">No recipes yet. Start pickling!</p>
+                        <p className="text-gray-500 mb-4">No recipes yet. Start pickling!</p>
                         <Link
-                            to="/new-recipe"
+                            to="/manager/new-recipe"
                             className="inline-flex items-center space-x-2 text-pickle-green-600 font-semibold hover:underline"
                         >
                             Create your first recipe
@@ -203,7 +204,7 @@ const Home = () => {
                         {recipes.map((recipe) => (
                             <Link
                                 key={recipe.id}
-                                to={`/recipes/${recipe.id}`}
+                                to={`/manager/recipes/${recipe.id}`}
                                 className="block bg-white p-5 rounded-xl shadow-sm border border-gray-100 hover:shadow-md hover:border-pickle-green-200 transition"
                             >
                                 <h2 className="text-xl font-semibold text-gray-800 mb-2">{recipe.name}</h2>

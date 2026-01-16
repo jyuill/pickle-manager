@@ -37,6 +37,7 @@ app.add_middleware(
 
 # --- Security & Cloudinary ---
 from fastapi import Header, Query
+from sqlalchemy import func
 import hashlib
 import time
 
@@ -47,6 +48,41 @@ def verify_admin(x_admin_password: str = Header(None)):
     if x_admin_password != ADMIN_PASSWORD:
         raise HTTPException(status_code=401, detail="Invalid Admin Password")
     return True
+
+@app.get("/stats")
+def get_stats(session: Session = Depends(get_session)):
+    total_recipes = session.exec(select(func.count(Recipe.id))).one()
+    total_batches = session.exec(select(func.count(Batch.id))).one()
+    
+    # Avg rating
+    avg_rating_res = session.exec(select(func.avg(TastingNote.rating))).one()
+    avg_rating = round(float(avg_rating_res), 1) if avg_rating_res is not None else 0.0
+    
+    # Activity
+    activity_res = session.exec(select(Batch.made_date, func.count(Batch.id)).group_by(Batch.made_date)).all()
+    
+    activity = []
+    for dt, count in activity_res:
+        level = 0
+        if count > 0: level = 1
+        if count >= 2: level = 2
+        if count >= 3: level = 3
+        if count >= 5: level = 4
+        
+        activity.append({
+            "date": dt.isoformat(),
+            "count": count,
+            "level": level
+        })
+        
+    activity.sort(key=lambda x: x['date'])
+        
+    return {
+        "total_recipes": total_recipes,
+        "total_batches": total_batches,
+        "average_rating": avg_rating,
+        "activity": activity
+    }
 
 @app.get("/signature", dependencies=[Depends(verify_admin)])
 def get_signature(upload_preset: Optional[str] = None):

@@ -37,14 +37,14 @@ const BatchDetail = () => {
     if (error) return (
         <div className="text-center py-10">
             <div className="text-red-500 mb-4">{error}</div>
-            <Link to="/" className="text-pickle-green-600 hover:underline">Return Home</Link>
+            <Link to="/manager" className="text-pickle-green-600 hover:underline">Return Home</Link>
         </div>
     );
 
     return (
         <div>
             <div className="mb-4">
-                <button onClick={() => navigate('/')} className="text-gray-500 hover:text-gray-700 flex items-center space-x-1">
+                <button onClick={() => navigate('/manager')} className="text-gray-500 hover:text-gray-700 flex items-center space-x-1">
                     <ArrowLeft size={20} />
                     <span>Back to Home</span>
                 </button>
@@ -235,7 +235,7 @@ const BatchDetail = () => {
                 <div className="mt-8 flex justify-between items-center bg-gray-50 p-4 rounded-lg">
                     <div className="flex space-x-4">
                         <Link
-                            to={`/batches/${id}/edit`}
+                            to={`/manager/batches/${id}/edit`}
                             className="flex items-center space-x-2 text-gray-500 hover:text-pickle-green-600 font-semibold transition"
                         >
                             <Edit size={20} />
@@ -249,7 +249,7 @@ const BatchDetail = () => {
                                 if (!window.confirm("Are you sure you want to delete this batch? All images and tasting notes will be removed.")) return;
                                 try {
                                     await api.delete(`/batches/${id}`);
-                                    navigate(`/recipes/${batch.recipe_id}`);
+                                    navigate(`/manager/recipes/${batch.recipe_id}`);
                                 } catch (e) { console.error("Failed to delete batch", e); }
                             }}
                             className="flex items-center space-x-2 text-red-400 hover:text-red-500 font-semibold transition"
@@ -260,7 +260,7 @@ const BatchDetail = () => {
                     </div>
 
                     <Link
-                        to={`/recipes/${batch.recipe_id}`}
+                        to={`/manager/recipes/${batch.recipe_id}`}
                         className="flex items-center space-x-2 text-pickle-green-600 font-semibold hover:text-pickle-green-700 hover:underline"
                     >
                         <ChefHat size={20} />

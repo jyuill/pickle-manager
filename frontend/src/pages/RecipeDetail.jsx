@@ -34,7 +34,7 @@ const RecipeDetail = () => {
     return (
         <div>
             <div className="mb-4">
-                <button onClick={() => navigate('/')} className="text-gray-500 hover:text-gray-700 flex items-center space-x-1">
+                <button onClick={() => navigate('/manager')} className="text-gray-500 hover:text-gray-700 flex items-center space-x-1">
                     <ArrowLeft size={20} />
                     <span>Back to Recipes</span>
                 </button>
@@ -43,8 +43,9 @@ const RecipeDetail = () => {
             <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100 mb-8">
                 <div className="flex justify-between items-start mb-4">
                     <h1 className="text-3xl font-bold text-gray-900">{recipe.name}</h1>
+                    <h1 className="text-3xl font-bold text-gray-900">{recipe.name}</h1>
                     <Link
-                        to={`/recipes/${id}/edit`}
+                        to={`/manager/recipes/${id}/edit`}
                         className="text-gray-500 hover:text-pickle-green-600 transition"
                     >
                         <Edit size={24} />
@@ -79,7 +80,7 @@ const RecipeDetail = () => {
             <div className="flex items-center justify-between mb-4">
                 <h2 className="text-2xl font-bold text-gray-800">Batches</h2>
                 <Link
-                    to={`/recipes/${id}/new-batch`}
+                    to={`/manager/recipes/${id}/new-batch`}
                     className="flex items-center space-x-2 bg-pickle-green-600 text-white px-4 py-2 rounded-lg hover:bg-pickle-green-700 transition shadow-sm"
                 >
                     <Plus size={20} />
@@ -95,7 +96,7 @@ const RecipeDetail = () => {
                 <div className="space-y-4">
                     {batches.map((batch) => (
                         <Link
-                            to={`/batches/${batch.id}`}
+                            to={`/manager/batches/${batch.id}`}
                             key={batch.id}
                             className="block bg-white p-5 rounded-xl shadow-sm border border-gray-100 hover:border-pickle-green-200 hover:shadow-md transition"
                         >

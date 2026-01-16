@@ -71,14 +71,14 @@ const CreateBatch = () => {
                 if (initialImage) {
                     await api.post(`/batches/${batchId}/images/`, { image_url: initialImage });
                 }
-                navigate(`/batches/${batchId}`);
+                navigate(`/manager/batches/${batchId}`);
             } else {
                 const res = await api.post('/batches/', payload);
                 const newBatchId = res.data.id;
                 if (initialImage) {
                     await api.post(`/batches/${newBatchId}/images/`, { image_url: initialImage });
                 }
-                navigate(`/recipes/${recipeId}`);
+                navigate(`/manager/recipes/${recipeId}`);
             }
         } catch (error) {
             console.error("Failed to save batch", error);

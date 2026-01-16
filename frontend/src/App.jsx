@@ -8,6 +8,8 @@ import CreateRecipe from './pages/CreateRecipe';
 import CreateBatch from './pages/CreateBatch';
 import BatchDetail from './pages/BatchDetail';
 import LoginModal from './components/LoginModal';
+import LandingPage from './pages/LandingPage';
+import StatsPage from './pages/StatsPage';
 import { useState, useEffect } from 'react';
 
 const GA_MEASUREMENT_ID = import.meta.env.VITE_GOOGLE_ANALYTICS_ID;
@@ -37,19 +39,27 @@ function App() {
   return (
     <Router>
       <AnalyticsTracker />
-      <Layout>
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/recipes/:id" element={<RecipeDetail />} />
-          <Route path="/recipes/:id/edit" element={<CreateRecipe />} />
-          <Route path="/batches/:id" element={<BatchDetail />} />
-          <Route path="/batches/:batchId/edit" element={<CreateBatch />} />
-          <Route path="/new-recipe" element={<CreateRecipe />} />
-          <Route path="/recipes/:recipeId/new-batch" element={<CreateBatch />} />
-          <Route path="/recipes/:recipeId/new-batch" element={<CreateBatch />} />
-        </Routes>
-        {showLogin && <LoginModal onClose={() => setShowLogin(false)} />}
-      </Layout>
+      <Routes>
+        {/* Public Routes */}
+        <Route path="/" element={<LandingPage />} />
+        <Route path="/stats" element={<StatsPage />} />
+
+        {/* Protected Manager App Routes */}
+        <Route path="/manager/*" element={
+          <Layout>
+            <Routes>
+              <Route path="/" element={<Home />} />
+              <Route path="recipes/:id" element={<RecipeDetail />} />
+              <Route path="recipes/:id/edit" element={<CreateRecipe />} />
+              <Route path="batches/:id" element={<BatchDetail />} />
+              <Route path="batches/:batchId/edit" element={<CreateBatch />} />
+              <Route path="new-recipe" element={<CreateRecipe />} />
+              <Route path="recipes/:recipeId/new-batch" element={<CreateBatch />} />
+            </Routes>
+            {showLogin && <LoginModal onClose={() => setShowLogin(false)} />}
+          </Layout>
+        } />
+      </Routes>
     </Router>
   );
 }

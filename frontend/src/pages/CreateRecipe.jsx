@@ -39,10 +39,10 @@ const CreateRecipe = () => {
         try {
             if (isEditMode) {
                 await api.patch(`/recipes/${id}`, formData);
-                navigate(`/recipes/${id}`);
+                navigate(`/manager/recipes/${id}`);
             } else {
                 await api.post('/recipes/', formData);
-                navigate('/');
+                navigate('/manager');
             }
         } catch (error) {
             console.error("Failed to save recipe", error);
