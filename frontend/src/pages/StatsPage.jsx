@@ -1,8 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import api from '../api';
-import * as ActivityCalendarPkg from 'react-activity-calendar';
-
-const ActivityCalendar = ActivityCalendarPkg.default || ActivityCalendarPkg;
+import { ActivityCalendar } from 'react-activity-calendar';
 import { Link } from 'react-router-dom';
 import { ArrowLeft, ChefHat, Database, Star } from 'lucide-react';
 
