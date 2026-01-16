@@ -2,7 +2,8 @@ from fastapi import FastAPI, Depends, HTTPException, status
 from dotenv import load_dotenv
 import os
 
-load_dotenv()
+# override=True ensures that if we update .env locally, the changes are picked up on reload
+load_dotenv(override=True)
 
 from sqlmodel import Session, select
 from typing import List, Optional
