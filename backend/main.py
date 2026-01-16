@@ -1,4 +1,9 @@
 from fastapi import FastAPI, Depends, HTTPException, status
+from dotenv import load_dotenv
+import os
+
+load_dotenv()
+
 from sqlmodel import Session, select
 from typing import List, Optional
 from database import init_db, get_session
@@ -46,6 +51,7 @@ CLOUDINARY_API_SECRET = os.getenv("CLOUDINARY_API_SECRET", "")
 
 def verify_admin(x_admin_password: str = Header(None)):
     if x_admin_password != ADMIN_PASSWORD:
+        print(f"AUTH FAIL: Received '{x_admin_password}' vs Expected '{ADMIN_PASSWORD}'")
         raise HTTPException(status_code=401, detail="Invalid Admin Password")
     return True
 
