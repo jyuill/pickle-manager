@@ -42,7 +42,7 @@ const ImageUpload = ({ onUploadSuccess, label = "Add Photo", autoClear = false }
 
             setUploading(false);
             if (onUploadSuccess) {
-                onUploadSuccess(res.data.secure_url);
+                await onUploadSuccess(res.data.secure_url);
             }
             if (autoClear) {
                 setPreview(null);
@@ -51,17 +51,11 @@ const ImageUpload = ({ onUploadSuccess, label = "Add Photo", autoClear = false }
             console.error("Upload failed", error);
             setUploading(false);
             if (error.response?.status === 401) {
-                // Auth error handled by interceptor, but we still need to stop loading
-                // User will see login modal
+                // Auth error handled by interceptor
             } else {
-                alert("Failed to upload image. ensure you are logged in and have API Key configured.");
+                // Show specific error message
+                alert(`Upload Error: ${error.message || "Unknown error"}`);
             }
-            // Keep preview if it was just an auth error so they can see what they tried to upload?
-            // Actually better to reset or they might think it worked. 
-            // But if they login, they might want to retry.
-            // Let's keep preview but maybe show error state? Simpler to just reset for now or keep it.
-            // I'll leave the preview there so they know "oh I was trying to upload this". 
-            // But 'uploading' is false.
         }
     };
 
