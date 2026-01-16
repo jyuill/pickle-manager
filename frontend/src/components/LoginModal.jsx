@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
-import { Lock, X } from 'lucide-react';
+import { Lock, X, Eye, EyeOff } from 'lucide-react';
 
 const LoginModal = ({ onClose }) => {
     const [password, setPassword] = useState('');
+    const [showPassword, setShowPassword] = useState(false);
 
     const handleSubmit = (e) => {
         e.preventDefault();
@@ -26,15 +27,22 @@ const LoginModal = ({ onClose }) => {
                 </div>
 
                 <form onSubmit={handleSubmit} className="p-6">
-                    <div className="mb-4">
+                    <div className="mb-4 relative">
                         <input
-                            type="password"
+                            type={showPassword ? "text" : "password"}
                             autoFocus
                             placeholder="Password"
-                            className="w-full p-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-pickle-green-500 outline-none transition text-center text-lg"
+                            className="w-full p-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-pickle-green-500 outline-none transition text-center text-lg pr-10"
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
                         />
+                        <button
+                            type="button"
+                            onClick={() => setShowPassword(!showPassword)}
+                            className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                        >
+                            {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                        </button>
                     </div>
 
                     <button
