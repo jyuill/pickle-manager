@@ -16,9 +16,10 @@ const Layout = ({ children }) => {
                     <nav className="flex items-center space-x-6">
                         <Link
                             to="/"
-                            className={`text-sm font-medium hover:text-pickle-green-100 transition ${location.pathname === '/' ? 'text-white font-bold' : 'text-pickle-green-100/80'}`}
+                            className={`p-2 rounded-full hover:bg-pickle-green-700 transition ${location.pathname === '/' ? 'bg-pickle-green-700' : ''}`}
+                            title="Home"
                         >
-                            <Home size={20} className={location.pathname === '/' ? 'text-white' : 'text-pickle-green-100/80'} />
+                            <Home size={20} className="text-white" />
                         </Link>
                         <Link
                             to="/manager"
