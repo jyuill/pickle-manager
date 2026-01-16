@@ -18,7 +18,7 @@ const LandingPage = () => {
                 Pickle Johnny
             </h1>
             <p className="text-xl text-gray-600 mb-10 max-w-lg mx-auto">
-                Small batch fermentation, artisanal recipes, and serious flavor management.
+                Single jar fermentation, house-made recipes...outrageously good pickles!
             </p>
 
             <div className="flex flex-col sm:flex-row items-center gap-4">
