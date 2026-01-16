@@ -18,7 +18,7 @@ const Layout = ({ children }) => {
                             to="/"
                             className={`text-sm font-medium hover:text-pickle-green-100 transition ${location.pathname === '/' ? 'text-white font-bold' : 'text-pickle-green-100/80'}`}
                         >
-                            Home
+                            <Home size={20} className={location.pathname === '/' ? 'text-white' : 'text-pickle-green-100/80'} />
                         </Link>
                         <Link
                             to="/manager"
