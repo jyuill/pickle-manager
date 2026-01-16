@@ -12,7 +12,7 @@ class Recipe(RecipeBase, table=True):
     created_at: datetime = Field(default_factory=datetime.utcnow)
     updated_at: datetime = Field(default_factory=datetime.utcnow)
     
-    batches: List["Batch"] = Relationship(back_populates="recipe")
+    batches: List["Batch"] = Relationship(back_populates="recipe", sa_relationship_kwargs={"cascade": "all, delete-orphan"})
 
 class RecipeCreate(RecipeBase):
     pass

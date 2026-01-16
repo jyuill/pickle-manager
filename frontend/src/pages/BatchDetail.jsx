@@ -46,7 +46,7 @@ const BatchDetail = () => {
             <div className="mb-4">
                 <button onClick={() => navigate('/manager')} className="text-gray-500 hover:text-gray-700 flex items-center space-x-1">
                     <ArrowLeft size={20} />
-                    <span>Back to Home</span>
+                    <span>Back to Manager</span>
                 </button>
             </div>
 

@@ -42,7 +42,13 @@ function App() {
       <Routes>
         {/* Public Routes */}
         <Route path="/" element={<LandingPage />} />
-        <Route path="/stats" element={<StatsPage />} />
+
+        {/* Layout Wrapped Routes */}
+        <Route path="/stats" element={
+          <Layout>
+            <StatsPage />
+          </Layout>
+        } />
 
         {/* Protected Manager App Routes */}
         <Route path="/manager/*" element={

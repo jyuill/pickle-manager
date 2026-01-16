@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import api from '../api';
-import { ArrowLeft, Plus, Calendar, Star, Edit, Clock } from 'lucide-react';
+import { ArrowLeft, Plus, Calendar, Star, Edit, Clock, Trash2 } from 'lucide-react';
 
 const RecipeDetail = () => {
     const { id } = useParams();
@@ -28,6 +28,18 @@ const RecipeDetail = () => {
         fetchData();
     }, [id]);
 
+    const handleDelete = async () => {
+        if (window.confirm("Are you sure you want to delete this recipe? This will also delete ALL associated batches and reviews. This action cannot be undone.")) {
+            try {
+                await api.delete(`/recipes/${id}`);
+                navigate('/manager');
+            } catch (error) {
+                console.error("Failed to delete recipe", error);
+                alert("Failed to delete recipe.");
+            }
+        }
+    };
+
     if (loading) return <div className="text-center py-10">Loading...</div>;
     if (!recipe) return <div className="text-center py-10">Recipe not found</div>;
 
@@ -43,13 +55,21 @@ const RecipeDetail = () => {
             <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100 mb-8">
                 <div className="flex justify-between items-start mb-4">
                     <h1 className="text-3xl font-bold text-gray-900">{recipe.name}</h1>
-                    <h1 className="text-3xl font-bold text-gray-900">{recipe.name}</h1>
-                    <Link
-                        to={`/manager/recipes/${id}/edit`}
-                        className="text-gray-500 hover:text-pickle-green-600 transition"
-                    >
-                        <Edit size={24} />
-                    </Link>
+                    <div className="flex space-x-2">
+                        <Link
+                            to={`/manager/recipes/${id}/edit`}
+                            className="text-gray-500 hover:text-pickle-green-600 transition"
+                        >
+                            <Edit size={24} />
+                        </Link>
+                        <button
+                            onClick={handleDelete}
+                            className="text-gray-400 hover:text-red-500 transition"
+                            title="Delete Recipe"
+                        >
+                            <Trash2 size={24} />
+                        </button>
+                    </div>
                 </div>
 
                 <div className="flex items-center space-x-4 text-sm text-gray-500 mb-6">

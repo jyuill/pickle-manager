@@ -280,6 +280,15 @@ def delete_batch_image(image_id: int, session: Session = Depends(get_session)):
     session.commit()
     return {"ok": True}
 
+@app.delete("/recipes/{recipe_id}", dependencies=[Depends(verify_admin)])
+def delete_recipe(recipe_id: int, session: Session = Depends(get_session)):
+    recipe = session.get(Recipe, recipe_id)
+    if not recipe:
+        raise HTTPException(status_code=404, detail="Recipe not found")
+    session.delete(recipe)
+    session.commit()
+    return {"ok": True}
+
 @app.post("/batches/", response_model=BatchRead, dependencies=[Depends(verify_admin)])
 def create_batch(batch: BatchCreate, session: Session = Depends(get_session)):
     # ID Generation Logic

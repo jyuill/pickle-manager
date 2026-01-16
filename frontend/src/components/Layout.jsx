@@ -9,16 +9,28 @@ const Layout = ({ children }) => {
         <div className="min-h-screen bg-gray-50 flex flex-col">
             <header className="bg-pickle-green-600 text-white shadow-md">
                 <div className="max-w-4xl mx-auto px-4 py-4 flex items-center justify-between">
-                    <Link to="/manager" className="flex items-center space-x-2 text-xl font-bold hover:text-pickle-green-100 transition">
+                    <Link to="/" className="flex items-center space-x-2 text-xl font-bold hover:text-pickle-green-100 transition">
                         <img src="/pickle-j-right-circle-gemini.png" alt="Pickle Manager" className="w-8 h-8 rounded-full" />
                         <span>Pickle Manager</span>
                     </Link>
-                    <nav className="flex space-x-4">
+                    <nav className="flex items-center space-x-6">
+                        <Link
+                            to="/"
+                            className={`text-sm font-medium hover:text-pickle-green-100 transition ${location.pathname === '/' ? 'text-white font-bold' : 'text-pickle-green-100/80'}`}
+                        >
+                            Home
+                        </Link>
                         <Link
                             to="/manager"
-                            className={`p-2 rounded-full hover:bg-pickle-green-700 transition ${location.pathname === '/manager' ? 'bg-pickle-green-700' : ''}`}
+                            className={`text-sm font-medium hover:text-pickle-green-100 transition ${location.pathname.startsWith('/manager') ? 'text-white font-bold' : 'text-pickle-green-100/80'}`}
                         >
-                            <Home size={24} />
+                            Manager
+                        </Link>
+                        <Link
+                            to="/stats"
+                            className={`text-sm font-medium hover:text-pickle-green-100 transition ${location.pathname === '/stats' ? 'text-white font-bold' : 'text-pickle-green-100/80'}`}
+                        >
+                            Stats
                         </Link>
                     </nav>
                 </div>
